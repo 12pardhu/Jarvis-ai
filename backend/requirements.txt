@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+apscheduler
+python-dotenv
+SpeechRecognition
+pyttsx3
+websockets
+bcrypt
