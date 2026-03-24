@@ -36,6 +36,14 @@ def route_command(command, *, session_id: str | None = None):
 
         webbrowser.open(url)
         return f"Opening {site}"
+        
+    # 🤖 BROWSER AUTOMATION (BROWSER-USE)
+    if command.startswith("browse ") or command.startswith("web "):
+        from app.automation.browser_agent import run_browser_task
+        task = command.replace("browse to ", "").replace("browse ", "").replace("web ", "").strip()
+        print(f"Starting browser agent for: {task}")
+        response = run_browser_task(task)
+        return response
 
     # 🔍 GOOGLE SEARCH
     if command.startswith("search "):

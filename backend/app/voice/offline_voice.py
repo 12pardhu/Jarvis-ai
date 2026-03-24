@@ -1,11 +1,15 @@
 import queue
 import sounddevice as sd
 import json
+import os
 from vosk import Model, KaldiRecognizer
 
 q = queue.Queue()
 
-model = Model("models/vosk-model-small-en-us-0.15")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "vosk-model-small-en-us-0.15")
+
+model = Model(MODEL_PATH)
 rec = KaldiRecognizer(model, 16000)
 
 def callback(indata, frames, time, status):

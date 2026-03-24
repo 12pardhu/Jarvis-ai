@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.voice.offline_voice import listen_offline
-# 🔥 Core imports (keep only stable ones)
 from app.api.routes_chat import router as chat_router
 from app.router.command_router import route_command
+from app.memory.session_store import session_memory
+from app.security.auth import verify_secret, get_auth_config
 from app.memory.session_store import session_memory
 
 # 🚀 Initialize app
@@ -26,6 +27,31 @@ app.include_router(chat_router)
 @app.get("/")
 def root():
     return {"message": "Jarvis AI is running 🚀"}
+
+# 🔒 Auth endpoints
+class VoiceAuthRequest(BaseModel):
+    phrase: str
+
+class PinAuthRequest(BaseModel):
+    pin: str
+
+@app.post("/auth/voice")
+def auth_voice(body: VoiceAuthRequest):
+    cfg = get_auth_config()
+    if not cfg.voice_hash:
+        return {"status": "ok", "message": "Voice auth not configured"}
+    if verify_secret(body.phrase.lower().strip(), cfg.voice_hash):
+        return {"status": "ok"}
+    raise HTTPException(status_code=401, detail="Invalid phrase")
+
+@app.post("/auth/pin")
+def auth_pin(body: PinAuthRequest):
+    cfg = get_auth_config()
+    if not cfg.pin_hash:
+        return {"status": "ok", "message": "PIN auth not configured"}
+    if verify_secret(body.pin.strip(), cfg.pin_hash):
+        return {"status": "ok"}
+    raise HTTPException(status_code=401, detail="Invalid PIN")
 
 # 📦 Request model
 class JarvisChatRequest(BaseModel):
