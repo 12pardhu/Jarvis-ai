@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 from app.voice.offline_voice import listen_offline
 from app.api.routes_chat import router as chat_router
 from app.router.command_router import route_command
@@ -15,7 +16,7 @@ app = FastAPI(title="Jarvis AI")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -56,7 +57,7 @@ def auth_pin(body: PinAuthRequest):
 # 📦 Request model
 class JarvisChatRequest(BaseModel):
     message: str = ""
-    session_id: str | None = None
+    session_id: Optional[str] = None
 
 # 🤖 Main Jarvis endpoint
 @app.post("/jarvis-chat")
